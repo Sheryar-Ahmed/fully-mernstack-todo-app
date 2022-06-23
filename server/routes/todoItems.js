@@ -1,46 +1,86 @@
 const router = require('express').Router();
-
+const bcrypt = require('bcrypt');
 //import todo schema that we created 
 
 const todoItemsModel = require('../models/todoitems');
+const userModel = require('../models/Auth');
 
+//user Authentication, first register the user
+
+router.post('/api/users', async (req, res) => {
+    try {
+        //check if the user is already registered.
+        let user = await userModel.findOne({ Email: req.body.Email });
+        if (user) return res.status(400).json("User already Exists");
+
+        user = new userModel({
+            Email: req.body.Email,
+            password: req.body.password
+        })
+        const salt = await bcrypt.genSalt(10);
+        //here we updating the user password to encryption so if our database is hacked then the hacker cannot have access to accounts.
+        user.password = await bcrypt.hash(user.password, salt);
+        //save the user form in the db
+        const saveUser = await user.save();
+        res.status(200).json({ id: saveUser._id, Email: saveUser.Email });
+    } catch (err) {
+        res.json(err);
+    }
+})
+
+//authenticating the user
+
+router.post("/api/auth", async (req, res) => {
+    try {
+        const user = await userModel.findOne({ Email: req.body.Email });
+        if (!user) return res.status(400).json("Invalid Email or password");
+
+        //we have a compare property in bcrypt which compares the current user password to the client.
+        const validatePass = await bcrypt.compare(req.body.password, user.password);
+        if(!validatePass) return res.status(400).json("Invalid Email or password");
+
+        res.status(200).json(true);
+    } catch (err) {
+        res.json(err);
+    }
+})
 //create our first route to save the user todo to the mongodb
 
-router.post('/api/item', async (req,res) => {
-    try{
+router.post('/api/item', async (req, res) => {
+    try {
         const newTodoItem = new todoItemsModel({
             item: req.body.item,
         })
         //save item int he db
-        const saveItem = await  newTodoItem.save();
+        const saveItem = await newTodoItem.save();
         res.status(200).json(saveItem);
-    }catch(err){
+    } catch (err) {
         res.json(err);
     }
 })
 
 //get all todos from the db
 
-router.get('/api/items',async (req,res) => {
+router.get('/api/items', async (req, res) => {
     const getAllTodos = await todoItemsModel.find({});
     res.status(200).json(getAllTodos);
 })
 
 //create our second route to update the todo according to it's id.
 
-router.put('/api/item/:id',async (req,res) => {
-    try{
+router.put('/api/item/:id', async (req, res) => {
+    try {
         //find the item and update it according to its id
-        const updateTodoItem = await todoItemsModel.findByIdAndUpdate(req.params.id,{$set: req.body});
+        const updateTodoItem = await todoItemsModel.findByIdAndUpdate(req.params.id, { $set: req.body });
         res.status(200).json("Todo Updated Successfully");
-    }catch(err){
+    } catch (err) {
         res.json(err);
     }
 })
 //delete the specific todo from the db
-router.delete('/api/item/:id', async (req,res) => {
+router.delete('/api/item/:id', async (req, res) => {
     const deleteTodo = await todoItemsModel.findByIdAndDelete(req.params.id);
-    res.status(200).json("deleted successfully");
+    res.status(200).json("Deleted successfully");
 })
 
 
