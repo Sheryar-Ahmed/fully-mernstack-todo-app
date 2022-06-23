@@ -3,6 +3,11 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv').config();
 const cors = require('cors');
 const app = express();
+//checking the privateKEy
+if(!process.env.todo_jwtPrivateKey){
+    console.error("Fatal Error, jwtPrivateKey is not defined");
+    process.exit(1);
+}
 //to get data in json format we use app.use.
 app.use(express.json());
 //import our router in order to use it here.

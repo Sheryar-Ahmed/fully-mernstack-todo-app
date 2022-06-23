@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const bcrypt = require('bcrypt');
+const jwt = require("jsonwebtoken");
 //import todo schema that we created 
 
 const todoItemsModel = require('../models/todoitems');
@@ -22,7 +23,10 @@ router.post('/api/users', async (req, res) => {
         user.password = await bcrypt.hash(user.password, salt);
         //save the user form in the db
         const saveUser = await user.save();
-        res.status(200).json({ id: saveUser._id, Email: saveUser.Email });
+        //let's suppose the user registered and we don't want him to login then we add token to the header.
+        const token = jwt.sign({ id: user._id }, process.env.todo_jwtPrivateKey);
+
+        res.header('x-auth-token', token).status(200).json({ id: saveUser._id, Email: saveUser.Email });
     } catch (err) {
         res.json(err);
     }
@@ -37,9 +41,11 @@ router.post("/api/auth", async (req, res) => {
 
         //we have a compare property in bcrypt which compares the current user password to the client.
         const validatePass = await bcrypt.compare(req.body.password, user.password);
-        if(!validatePass) return res.status(400).json("Invalid Email or password");
+        if (!validatePass) return res.status(400).json("Invalid Email or password");
 
-        res.status(200).json(true);
+        //generating the token is very neccessary.
+        const token = jwt.sign({ id: user._id }, process.env.todo_jwtPrivateKey);
+        res.status(200).json(token);
     } catch (err) {
         res.json(err);
     }
