@@ -8,10 +8,9 @@ function App() {
   let navigate = useNavigate();
 
   React.useEffect(() => {
-
+    
     const isLoggedIn = window.localStorage.getItem('token') ? true : false;
     isLoggedIn ? navigate('/') : navigate('/signIn');
-    
   }, [window.localStorage.getItem('token')])
 
   return (

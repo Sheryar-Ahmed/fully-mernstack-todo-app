@@ -45,7 +45,7 @@ router.post("/api/auth", async (req, res) => {
 
         //generating the token is very neccessary.
         const token = jwt.sign({ id: user._id }, process.env.todo_jwtPrivateKey);
-        res.status(200).json(token);
+        res.status(200).json({Token: token, Email:user.Email});
     } catch (err) {
         res.json(err);
     }
@@ -56,6 +56,7 @@ router.post('/api/item', async (req, res) => {
     try {
         const newTodoItem = new todoItemsModel({
             item: req.body.item,
+            Email: req.body.Email
         })
         //save item int he db
         const saveItem = await newTodoItem.save();

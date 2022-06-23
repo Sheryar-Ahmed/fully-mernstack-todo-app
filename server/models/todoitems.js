@@ -7,6 +7,10 @@ const TodoItemSchema = mongoose.Schema({
     item: {
         type : String,
         required: true
+    },
+    Email: {
+        type: String,
+        required: true
     }
 })
 

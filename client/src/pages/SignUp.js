@@ -61,6 +61,7 @@ const SignUp = () => {
   const RegisterUser = async (values) => {
     try {
       const user = await axios.post("http://localhost:5500/api/users", values);
+      window.localStorage.setItem("Email",JSON.stringify(user.data))
       setShowSnack(true);
       if (user) return navigate('/signIn');
     } catch (ex) {

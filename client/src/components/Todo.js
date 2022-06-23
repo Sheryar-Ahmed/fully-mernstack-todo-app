@@ -31,7 +31,8 @@ display: flex;
 flex-direction: row;
 justify-content: space-between;
 align-items: center;
-align-content: centerch;
+align-content: center;
+margin-bottom: 0.2rem;
 `;
 const TextField = styled(MuiTextField)`
 width:70%;
@@ -58,16 +59,20 @@ const Todo = () => {
   const [showSnack, setShowSnack] = React.useState(false);
   const [error, setError] = React.useState(false);
   const [text, setText] = React.useState('');
+  //getting the current user Email
+  const data = JSON.parse(window.localStorage.getItem("Email"));
   //getting all todos from the db
   React.useEffect(() => {
     const getAllTodos = async () => {
       try {
         const allTodos = await axios.get('http://localhost:5500/api/items', { timeout: 30000 });
-        if(allTodos.data.length <= 0 ){
+        //get todos according to the user and displayed them;
+        const currentUserTodos = await allTodos.data.filter((item) => item.Email === data.Email);
+        if (currentUserTodos.length <= 0) {
           setError(true);
           setText("You Don't Have Any Todo Yet, You can Create.")
         }
-        setListTodos(allTodos.data);
+        setListTodos(currentUserTodos);
       } catch (err) {
         setError(true);
         setText(err);
@@ -78,8 +83,12 @@ const Todo = () => {
   //adding the todo
   const addTodo = async (e) => {
     e.preventDefault();
+    const value = {
+      "item": userTodo,
+      "Email": data.Email
+    }
     try {
-      const response = await axios.post('http://localhost:5500/api/item', { item: userTodo, timeout: 30000 });
+      const response = await axios.post('http://localhost:5500/api/item', value, { timeout: 30000 });
       setListTodos((prev) => [...prev, response.data]);
       SetUserTodo('');
       setShowSnack(true);
