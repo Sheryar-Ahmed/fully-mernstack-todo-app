@@ -12,6 +12,7 @@ import DeleteIcon from '@mui/icons-material/DeleteSweepOutlined';
 import UpdateIcon from '@mui/icons-material/CleanHandsOutlined';
 import axios from 'axios';
 import AlertMsg from './AlertMsg';
+import Navbar from './Navbar';
 
 const Wrapper = styled.div`
 margin: 2rem auto;
@@ -20,7 +21,7 @@ background:white;
 border: 1px solid #ddd;
 padding:1rem;
 @media(max-width:800px){
-  width:100%;
+  width:90%;
 }
 `;
 const Form = styled.form`
@@ -60,7 +61,7 @@ const Todo = () => {
   const [error, setError] = React.useState(false);
   const [text, setText] = React.useState('');
   //getting the current user Email
-  const data = JSON.parse(window.localStorage.getItem("Email"));
+  const data = JSON.parse(window.sessionStorage.getItem("Email"));
   //getting all todos from the db
   React.useEffect(() => {
     const getAllTodos = async () => {
@@ -125,6 +126,9 @@ const Todo = () => {
   };
 
   return <React.Fragment>
+    <Navbar 
+      hide={true}
+    />
     <Wrapper>
       <Form onSubmit={(e) => addTodo(e)}>
         <TodoInfo>

@@ -62,8 +62,8 @@ const SignIn = () => {
   const authUser = async (values) => {
     try {
       const user = await axios.post("http://localhost:5500/api/auth", values);
-      window.localStorage.setItem('Email', JSON.stringify(user.data));
-      window.localStorage.setItem('token', user.data.Token);
+      window.sessionStorage.setItem('Email', JSON.stringify(user.data));
+      window.sessionStorage.setItem('token', user.data.Token);
       if (user.data) return navigate("/")
     } catch (ex) {
       setError(ex.response.data);
