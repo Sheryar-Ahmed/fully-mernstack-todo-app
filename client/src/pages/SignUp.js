@@ -60,7 +60,7 @@ const SignUp = () => {
 
   const RegisterUser = async (values) => {
     try {
-      const user = await axios.post("http://localhost:5500/api/users", values);
+      const user = await axios.post(" https://james-todo-list.herokuapp.com/api/users", values);
       window.sessionStorage.setItem("Email",JSON.stringify(user.data))
       setShowSnack(true);
       if (user) return navigate('/signIn');
